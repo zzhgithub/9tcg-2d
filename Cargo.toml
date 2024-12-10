@@ -1,0 +1,16 @@
+[package]
+name = "tcg_2d"
+version = "0.1.0"
+edition = "2024"
+
+
+[[bin]]
+name = "server"
+path = "src/bin/server.rs"
+
+[[bin]]
+name = "client"
+path = "src/bin/client.rs"
+
+[dependencies]
+bevy = { version = "0.15.0", features = ["jpeg"] }
