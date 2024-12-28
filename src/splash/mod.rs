@@ -1,12 +1,15 @@
+use crate::VERSION;
 use crate::common::game_state::GameState;
 use bevy::app::App;
 use bevy::log::info;
 use bevy::prelude::{
     AlignItems, AssetServer, BuildChildren, Camera2d, ChildBuild, Commands, Deref, DerefMut,
-    ImageNode, IntoSystemConfigs, Name, NextState, OnEnter, Plugin, Res, ResMut, Resource,
-    StateScoped, Time, Timer, TimerMode, Update, in_state,
+    ImageNode, IntoSystemConfigs, JustifyText, Name, NextState, OnEnter, Plugin, PositionType, Res,
+    ResMut, Resource, StateScoped, Text, TextLayout, Time, Timer, TimerMode, Update, in_state,
 };
+use bevy::text::TextFont;
 use bevy::ui::{JustifyContent, Node, Val};
+use bevy::utils::default;
 
 // 标题画面
 pub struct SplashPlugin;
@@ -37,6 +40,20 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
         ))
         .with_children(|parent| {
             parent.spawn(ImageNode::new(image));
+            parent.spawn((
+                Text::new("9TCG Ver:".to_owned() + VERSION),
+                TextFont {
+                    font_size: 67.0,
+                    ..default()
+                },
+                TextLayout::new_with_justify(JustifyText::Center),
+                Node {
+                    position_type: PositionType::Absolute,
+                    bottom: Val::Px(5.0),
+                    right: Val::Px(5.0),
+                    ..default()
+                },
+            ));
         });
 
     // Insert the timer as a resource
