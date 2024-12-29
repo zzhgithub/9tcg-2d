@@ -3,6 +3,7 @@ use bevy::app::App;
 use bevy::asset::AssetServer;
 use bevy::prelude::*;
 use bevy::ui::Node;
+use bevy_kira_audio::{AudioControl, AudioSource};
 
 pub struct MenuPlugin;
 #[derive(Component)]
@@ -12,7 +13,11 @@ impl Plugin for MenuPlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<MenuState>();
         app.enable_state_scoped_entities::<MenuState>();
-        app.add_systems(OnEnter(GameState::Menu), setup);
+        app.add_systems(
+            OnEnter(GameState::Menu),
+            (setup, play_menu_music.after(setup)),
+        );
+        app.add_systems(OnExit(GameState::Menu), stop_menu_music);
         app.add_systems(Update, toggle_quit.run_if(in_state(GameState::Menu)));
         app.add_systems(
             Update,
@@ -21,10 +26,26 @@ impl Plugin for MenuPlugin {
     }
 }
 
+#[derive(Resource)]
+struct MenuMusicHandle(Handle<AudioSource>);
+
+fn play_menu_music(audio: Res<bevy_kira_audio::Audio>, music_handle: Res<MenuMusicHandle>) {
+    // 播放背景音乐并循环
+    audio.play(music_handle.0.clone()).looped();
+    info!("Menu music started.");
+}
+
+fn stop_menu_music(audio: Res<bevy_kira_audio::Audio>) {
+    // 停止所有音乐
+    audio.stop();
+    info!("Menu music stopped.");
+}
+
 // 初始化页面和ui
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     // 加载背景音乐
-    // todo
+    let menu_music = asset_server.load("main/bgm.mp3"); // 替换为实际音乐文件路径
+    commands.insert_resource(MenuMusicHandle(menu_music));
     // 背景图片
     let image = asset_server.load("main/bg.png");
     let font = asset_server.load("fonts/wqy-microhei.ttc");
