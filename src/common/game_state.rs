@@ -6,6 +6,7 @@ pub enum GameState {
     Splash,
     Menu,
     Desk,
+    Shop,
     Game,
 }
 

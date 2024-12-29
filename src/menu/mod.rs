@@ -17,7 +17,7 @@ impl Plugin for MenuPlugin {
             OnEnter(GameState::Menu),
             (setup, play_menu_music.after(setup)),
         );
-        app.add_systems(OnExit(GameState::Menu), stop_menu_music);
+        app.add_systems(OnExit(GameState::Menu), (stop_menu_music, disable));
         app.add_systems(Update, toggle_quit.run_if(in_state(GameState::Menu)));
         app.add_systems(
             Update,
@@ -41,8 +41,17 @@ fn stop_menu_music(audio: Res<bevy_kira_audio::Audio>) {
     info!("Menu music stopped.");
 }
 
+fn disable(mut next_state: ResMut<NextState<MenuState>>) {
+    next_state.set(MenuState::Disable);
+}
+
 // 初始化页面和ui
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut next_state: ResMut<NextState<MenuState>>,
+) {
+    next_state.set(MenuState::Main);
     // 加载背景音乐
     let menu_music = asset_server.load("main/bgm.mp3"); // 替换为实际音乐文件路径
     commands.insert_resource(MenuMusicHandle(menu_music));
