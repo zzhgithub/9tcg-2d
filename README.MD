@@ -15,3 +15,7 @@
 // 洗牌
 
 // 核心流转类
+
+```shell
+cargo run --release --bin client
+```
