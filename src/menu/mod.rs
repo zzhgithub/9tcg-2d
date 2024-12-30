@@ -6,15 +6,24 @@ use crate::menu::menu_button_action::{MenuButtonActionState, MenuButtonActions};
 use bevy::app::App;
 use bevy::asset::AssetServer;
 use bevy::prelude::*;
-use bevy::ui::Node;
+use bevy::ui::{FocusPolicy, Node};
 use bevy_kira_audio::{AudioControl, AudioSource};
 use bevy_persistent::prelude::*;
+use bevy_simple_text_input::{
+    TextInput, TextInputInactive, TextInputPlaceholder, TextInputPlugin, TextInputSettings,
+    TextInputSystem, TextInputTextColor, TextInputTextFont, TextInputValue,
+};
 use std::path::Path;
 
 pub struct MenuPlugin;
 #[derive(Component)]
 pub struct QuitButton;
 const COLOR_BUTTON: Color = Color::srgb(1.0, 0.5, 0.0);
+const BORDER_COLOR_INACTIVE: Color = Color::srgb(0.25, 0.25, 0.25);
+
+const BORDER_COLOR_ACTIVE: Color = Color::srgb(0.75, 0.52, 0.99);
+const TEXT_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
+const BACKGROUND_COLOR: Color = Color::WHITE;
 impl Plugin for MenuPlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<MenuState>();
@@ -30,6 +39,8 @@ impl Plugin for MenuPlugin {
         );
         app.add_systems(OnEnter(MenuState::Quit), quit_menu);
         app.add_systems(Update, quit_system.run_if(in_state(MenuState::Quit)));
+        app.add_systems(OnEnter(MenuState::Settings), setup_setting);
+        app.add_systems(Update, focus.before(TextInputSystem));
     }
 }
 
@@ -287,6 +298,120 @@ fn button_actions(
                 }
                 MenuButtonActionState::Duel => {
                     info!("Click On Duel!");
+                }
+            }
+        }
+    }
+}
+
+// setting
+fn setup_setting(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    settings: Res<Persistent<Settings>>,
+) {
+    let font = asset_server.load("fonts/wqy-microhei.ttc");
+
+    commands
+        .spawn((
+            Node {
+                width: Val::Percent(20.0),
+                height: Val::Percent(50.0),
+                margin: UiRect::all(Val::Auto),
+                border: UiRect::all(Val::Px(2.0)),
+                justify_content: JustifyContent::Center,
+                align_items: AlignItems::Center,
+                flex_direction: FlexDirection::ColumnReverse,
+                ..default()
+            },
+            BorderColor(Color::WHITE),
+            StateScoped(MenuState::Settings),
+            BackgroundColor(COLOR_BUTTON),
+        ))
+        .with_children(|parent| {
+            spawn_label_input(
+                parent,
+                "服务器".to_string(),
+                settings.service.to_string(),
+                font.clone(),
+            );
+            spawn_label_input(
+                parent,
+                "端口号".to_string(),
+                settings.port.to_string(),
+                font.clone(),
+            );
+            // todo 两个按钮
+        });
+}
+
+fn spawn_label_input(builder: &mut ChildBuilder, label: String, value: String, font: Handle<Font>) {
+    builder
+        .spawn((
+            Node {
+                width: Val::Percent(100.),
+                height: Val::Percent(30.),
+                margin: UiRect {
+                    top: Val::Px(5.0),
+                    bottom: Val::Px(5.0),
+                    ..Default::default()
+                },
+                justify_content: JustifyContent::SpaceBetween,
+                align_items: AlignItems::Center,
+                flex_direction: FlexDirection::Row,
+                ..Default::default()
+            },
+            Interaction::None,
+        ))
+        .with_children(|parent| {
+            parent.spawn((
+                Text::new(label),
+                TextFont {
+                    font: font.clone(),
+                    font_size: 20.0,
+                    ..default()
+                },
+                TextColor::BLACK,
+            ));
+            parent.spawn((
+                Node {
+                    width: Val::Px(200.0),
+                    border: UiRect::all(Val::Px(5.0)),
+                    padding: UiRect::all(Val::Px(5.0)),
+                    ..default()
+                },
+                BorderColor(BORDER_COLOR_ACTIVE),
+                BackgroundColor(BACKGROUND_COLOR),
+                TextInput,
+                TextInputTextFont(TextFont {
+                    font_size: 20.,
+                    ..default()
+                }),
+                TextInputSettings {
+                    retain_on_submit: true,
+                    ..default()
+                },
+                TextInputInactive(true),
+                FocusPolicy::Block,
+                TextInputValue(value),
+                TextInputTextColor(TextColor(Color::BLACK)),
+            ));
+        });
+}
+
+fn focus(
+    query: Query<(Entity, &Interaction), Changed<Interaction>>,
+    mut text_input_query: Query<(Entity, &mut TextInputInactive, &mut BorderColor)>,
+) {
+    for (interaction_entity, interaction) in &query {
+        if *interaction == Interaction::Pressed {
+            for (entity, mut inactive, mut border_color) in &mut text_input_query {
+                if entity == interaction_entity {
+                    inactive.0 = false;
+                    *border_color = BORDER_COLOR_ACTIVE.into();
+                } else {
+                    inactive.0 = true;
+                    *border_color = BORDER_COLOR_INACTIVE.into();
                 }
             }
         }
