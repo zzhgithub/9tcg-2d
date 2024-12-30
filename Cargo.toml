@@ -47,3 +47,6 @@ bevy = { version = "0.15.0", default-features = false, features = [
     "x11",
 ] }
 bevy_kira_audio = { version = "0.21.0", features = ["mp3"] }
+bevy-persistent = { version = "0.7.0", features = ["all"] }
+serde = "1.0.217"
+dirs = { version = "5.0" }

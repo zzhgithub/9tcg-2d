@@ -1,9 +1,15 @@
+pub mod menu_button_action;
+
 use crate::common::game_state::{GameState, MenuState};
+use crate::common::settings::Settings;
+use crate::menu::menu_button_action::{MenuButtonActionState, MenuButtonActions};
 use bevy::app::App;
 use bevy::asset::AssetServer;
 use bevy::prelude::*;
 use bevy::ui::Node;
 use bevy_kira_audio::{AudioControl, AudioSource};
+use bevy_persistent::prelude::*;
+use std::path::Path;
 
 pub struct MenuPlugin;
 #[derive(Component)]
@@ -18,11 +24,12 @@ impl Plugin for MenuPlugin {
             (setup, play_menu_music.after(setup)),
         );
         app.add_systems(OnExit(GameState::Menu), (stop_menu_music, disable));
-        app.add_systems(Update, toggle_quit.run_if(in_state(GameState::Menu)));
         app.add_systems(
             Update,
-            (quit_system, quit_menu).run_if(in_state(MenuState::Quit)),
+            (toggle_quit, button_actions).run_if(in_state(GameState::Menu)),
         );
+        app.add_systems(OnEnter(MenuState::Quit), quit_menu);
+        app.add_systems(Update, quit_system.run_if(in_state(MenuState::Quit)));
     }
 }
 
@@ -51,6 +58,27 @@ fn setup(
     asset_server: Res<AssetServer>,
     mut next_state: ResMut<NextState<MenuState>>,
 ) {
+    //setting startup
+    let config_dir = dirs::config_dir()
+        .map(|native_config_dir| native_config_dir.join("9tcg-2d"))
+        .unwrap_or(Path::new("session").join("settings"))
+        .join("myConfig");
+    commands.insert_resource(
+        Persistent::<Settings>::builder()
+            .name("key bindings")
+            .format(StorageFormat::Toml)
+            .path(config_dir.join("key-bindings.toml"))
+            .default(Settings {
+                service: "127.0.0.1".to_string(),
+                port: "28892".to_string(),
+                ext_dir: "./ext".to_string(),
+            })
+            .revertible(true)
+            .revert_to_default_on_deserialization_errors(true)
+            .build()
+            .expect("failed to initialize key bindings"),
+    );
+
     next_state.set(MenuState::Main);
     // 加载背景音乐
     let menu_music = asset_server.load("main/bgm.mp3"); // 替换为实际音乐文件路径
@@ -84,10 +112,34 @@ fn setup(
                 })
                 .with_children(|left_plane| {
                     // 按钮的位置
-                    spawn_button(left_plane, font.clone(), COLOR_BUTTON, "Shop");
-                    spawn_button(left_plane, font.clone(), COLOR_BUTTON, "卡组");
-                    spawn_button(left_plane, font.clone(), COLOR_BUTTON, "决斗");
-                    spawn_button(left_plane, font.clone(), COLOR_BUTTON, "设置");
+                    spawn_button(
+                        left_plane,
+                        font.clone(),
+                        COLOR_BUTTON,
+                        MenuButtonActions(MenuButtonActionState::Shop),
+                        "Shop",
+                    );
+                    spawn_button(
+                        left_plane,
+                        font.clone(),
+                        COLOR_BUTTON,
+                        MenuButtonActions(MenuButtonActionState::Desk),
+                        "卡组",
+                    );
+                    spawn_button(
+                        left_plane,
+                        font.clone(),
+                        COLOR_BUTTON,
+                        MenuButtonActions(MenuButtonActionState::Duel),
+                        "决斗",
+                    );
+                    spawn_button(
+                        left_plane,
+                        font.clone(),
+                        COLOR_BUTTON,
+                        MenuButtonActions(MenuButtonActionState::Setting),
+                        "设置",
+                    );
                 });
             parent.spawn(Node {
                 width: Val::Percent(33.3),
@@ -106,11 +158,13 @@ fn spawn_button(
     builder: &mut ChildBuilder,
     font: Handle<Font>,
     background_color: Color,
+    action: MenuButtonActions,
     text: &str,
 ) {
     builder
         .spawn((
             Button,
+            action,
             Node {
                 width: Val::Percent(25.),
                 height: Val::Px(50.),
@@ -206,6 +260,35 @@ fn quit_system(
     for (interaction, _quit_button) in interaction_query.iter() {
         if *interaction == Interaction::Pressed {
             app_exit_events.send(AppExit::Success);
+        }
+    }
+}
+
+fn button_actions(
+    interaction_query: Query<
+        (&Interaction, &MenuButtonActions),
+        (Changed<Interaction>, With<Button>),
+    >,
+    mut next_menu_state: ResMut<NextState<MenuState>>,
+    mut next_game_state: ResMut<NextState<GameState>>,
+) {
+    for (interaction, action) in interaction_query.iter() {
+        if *interaction == Interaction::Pressed {
+            match action.0.clone() {
+                MenuButtonActionState::Shop => {
+                    info!("Click On Shop!")
+                }
+                MenuButtonActionState::Desk => {
+                    info!("Click On Desk!")
+                }
+                MenuButtonActionState::Setting => {
+                    info!("Click On Setting!");
+                    next_menu_state.set(MenuState::Settings);
+                }
+                MenuButtonActionState::Duel => {
+                    info!("Click On Duel!");
+                }
+            }
         }
     }
 }
