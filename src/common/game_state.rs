@@ -18,3 +18,11 @@ pub enum MenuState {
     Settings,
     Quit,
 }
+
+#[derive(PartialEq, Clone, Eq, Copy, Default, Debug, Hash, States)]
+pub enum DeskState {
+    #[default]
+    Disable,
+    List,
+    Detail,
+}

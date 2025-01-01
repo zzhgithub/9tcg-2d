@@ -3,6 +3,7 @@ use bevy::window::{PresentMode, Window, WindowMode, WindowPlugin, WindowTheme};
 use bevy_kira_audio::AudioPlugin;
 use bevy_simple_text_input::TextInputPlugin;
 use tcg_2d::common::game_state::GameState;
+use tcg_2d::desk::DeskPlugins;
 use tcg_2d::menu::MenuPlugin;
 use tcg_2d::splash::SplashPlugin;
 
@@ -26,7 +27,7 @@ fn main() {
     app.init_state::<GameState>();
     app.enable_state_scoped_entities::<GameState>();
     // 加载不同的插件
-    app.add_plugins((TextInputPlugin, SplashPlugin, MenuPlugin));
+    app.add_plugins((TextInputPlugin, SplashPlugin, MenuPlugin, DeskPlugins));
 
     app.run();
 }

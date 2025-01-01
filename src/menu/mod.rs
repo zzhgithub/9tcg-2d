@@ -295,7 +295,9 @@ fn button_actions(
                     info!("Click On Shop!")
                 }
                 MenuButtonActionState::Desk => {
-                    info!("Click On Desk!")
+                    info!("Click On Desk!");
+                    next_menu_state.set(MenuState::Disable);
+                    next_game_state.set(GameState::Desk);
                 }
                 MenuButtonActionState::Setting => {
                     info!("Click On Setting!");
