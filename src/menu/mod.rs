@@ -1,7 +1,7 @@
 pub mod menu_button_action;
 
 use crate::common::game_state::{GameState, MenuState};
-use crate::common::settings::Settings;
+use crate::common::settings::{PortNameInput, ServiceNameInput, Settings};
 use crate::menu::menu_button_action::{MenuButtonActionState, MenuButtonActions};
 use bevy::app::App;
 use bevy::asset::AssetServer;
@@ -282,6 +282,11 @@ fn button_actions(
     >,
     mut next_menu_state: ResMut<NextState<MenuState>>,
     mut next_game_state: ResMut<NextState<GameState>>,
+    mut settings: ResMut<Persistent<Settings>>,
+    (service_query, port_query): (
+        Query<&TextInputValue, With<ServiceNameInput>>,
+        Query<&TextInputValue, With<PortNameInput>>,
+    ),
 ) {
     for (interaction, action) in interaction_query.iter() {
         if *interaction == Interaction::Pressed {
@@ -298,6 +303,26 @@ fn button_actions(
                 }
                 MenuButtonActionState::Duel => {
                     info!("Click On Duel!");
+                }
+                MenuButtonActionState::Save => {
+                    info!("Click On Save!");
+                    settings
+                        .update(|settings| {
+                            if !service_query.is_empty() {
+                                let service = service_query.get_single().unwrap();
+                                settings.service = service.0.clone();
+                            }
+                            if !port_query.is_empty() {
+                                let port = port_query.get_single().unwrap();
+                                settings.port = port.0.clone();
+                            }
+                        })
+                        .expect("failed to update settings");
+                    next_menu_state.set(MenuState::Main);
+                }
+                MenuButtonActionState::Cancel => {
+                    info!("Click On Cancel!");
+                    next_menu_state.set(MenuState::Main);
                 }
             }
         }
@@ -321,7 +346,7 @@ fn setup_setting(
                 border: UiRect::all(Val::Px(2.0)),
                 justify_content: JustifyContent::Center,
                 align_items: AlignItems::Center,
-                flex_direction: FlexDirection::ColumnReverse,
+                flex_direction: FlexDirection::Column,
                 ..default()
             },
             BorderColor(Color::WHITE),
@@ -334,18 +359,78 @@ fn setup_setting(
                 "服务器".to_string(),
                 settings.service.to_string(),
                 font.clone(),
+                ServiceNameInput,
             );
             spawn_label_input(
                 parent,
                 "端口号".to_string(),
                 settings.port.to_string(),
                 font.clone(),
+                PortNameInput,
             );
-            // todo 两个按钮
+            // 按钮容器
+            parent.spawn(
+                (Node {
+                    width: Val::Percent(100.),
+                    height: Val::Px(50.),
+                    margin: UiRect {
+                        top: Val::Px(20.),
+                        bottom: Val::Px(20.),
+                        ..default()
+                    },
+                    justify_content: JustifyContent::SpaceAround,
+                    align_items: AlignItems::Center,
+                    flex_direction: FlexDirection::Row,
+                    ..default()
+                }),
+            );
+        })
+        .with_children(|button_plane| {
+            // 保存和取消按钮
+            button_plane
+                .spawn((
+                    MenuButtonActions(MenuButtonActionState::Save),
+                    Button,
+                    BackgroundColor(Color::srgb(0.15, 0.65, 0.15)),
+                ))
+                .with_children(|parent| {
+                    parent.spawn((
+                        Text::new("保存"),
+                        TextFont {
+                            font: font.clone(),
+                            font_size: 20.0,
+                            ..default()
+                        },
+                        TextColor(Color::WHITE),
+                    ));
+                });
+            button_plane
+                .spawn((
+                    MenuButtonActions(MenuButtonActionState::Cancel),
+                    Button,
+                    BackgroundColor(Color::srgb(0.65, 0.15, 0.15)),
+                ))
+                .with_children(|parent| {
+                    parent.spawn((
+                        Text::new("取消"),
+                        TextFont {
+                            font: font.clone(),
+                            font_size: 20.0,
+                            ..default()
+                        },
+                        TextColor(Color::WHITE),
+                    ));
+                });
         });
 }
 
-fn spawn_label_input(builder: &mut ChildBuilder, label: String, value: String, font: Handle<Font>) {
+fn spawn_label_input(
+    builder: &mut ChildBuilder,
+    label: String,
+    value: String,
+    font: Handle<Font>,
+    component: impl Component,
+) {
     builder
         .spawn((
             Node {
@@ -374,6 +459,7 @@ fn spawn_label_input(builder: &mut ChildBuilder, label: String, value: String, f
                 TextColor::BLACK,
             ));
             parent.spawn((
+                component,
                 Node {
                     width: Val::Px(200.0),
                     border: UiRect::all(Val::Px(5.0)),

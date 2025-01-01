@@ -6,6 +6,8 @@ pub enum MenuButtonActionState {
     Desk,
     Setting,
     Duel,
+    Save,
+    Cancel,
 }
 
 #[derive(Component, Clone, Debug)]

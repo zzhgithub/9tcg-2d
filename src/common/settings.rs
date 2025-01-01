@@ -1,4 +1,4 @@
-use bevy::prelude::Resource;
+use bevy::prelude::{Component, Resource};
 use serde::{Deserialize, Serialize};
 
 // 设置文件
@@ -8,3 +8,9 @@ pub struct Settings {
     pub port: String,
     pub ext_dir: String,
 }
+
+#[derive(Component)]
+pub struct ServiceNameInput;
+
+#[derive(Component)]
+pub struct PortNameInput;
