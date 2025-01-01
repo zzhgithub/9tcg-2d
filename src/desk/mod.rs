@@ -98,9 +98,11 @@ fn layout_back_button_and_content(
                         },
                         ..default()
                     },
-                    BackgroundColor(Color::WHITE),
+                    BackgroundColor(Color::NONE),
                 ))
-                .with_children(spawn_content);
+                .with_children(|parent| {
+                    spawn_content(parent);
+                });
         });
 }
 
