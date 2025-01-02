@@ -1,8 +1,10 @@
 mod desk_button_action;
 mod list;
+mod scroll_list;
 
 use crate::common::game_state::{DeskState, GameState, MenuState};
 use crate::desk::desk_button_action::{DeskButtonActionState, DeskButtonActions};
+use crate::desk::scroll_list::update_scroll_position;
 use crate::menu::menu_button_action::MenuButtonActions;
 use bevy::prelude::*;
 use bevy::utils::info;
@@ -14,7 +16,10 @@ impl Plugin for DeskPlugins {
         app.init_state::<DeskState>();
         app.enable_state_scoped_entities::<DeskState>();
         app.add_systems(OnEnter(GameState::Desk), setup);
-        app.add_systems(Update, button_actions.run_if(in_state(GameState::Desk)));
+        app.add_systems(
+            Update,
+            (button_actions, update_scroll_position).run_if(in_state(GameState::Desk)),
+        );
 
         app.add_systems(OnEnter(DeskState::List), list::list_page);
     }

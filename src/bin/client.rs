@@ -15,7 +15,7 @@ fn main() {
         DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "9TCG".to_string(),
-                mode: WindowMode::Fullscreen(MonitorSelection::Primary),
+                mode: WindowMode::BorderlessFullscreen(MonitorSelection::Primary),
                 // resolution: (1920., 1080.).into(),
                 present_mode: PresentMode::AutoVsync,
                 window_theme: Some(WindowTheme::Dark),
