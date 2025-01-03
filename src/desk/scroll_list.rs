@@ -17,9 +17,10 @@ pub fn scroll_list<T, F>(
         .spawn((
             Node {
                 display: Display::Flex,
-                width: Val::Percent(100.),
-                height: Val::Percent(100.),
+                width: Val::Percent(96.),
+                height: Val::Percent(93.),
                 flex_direction: FlexDirection::Column,
+                margin: UiRect::all(Val::Px(5.)),
                 overflow: Overflow::scroll_y(),
                 ..default()
             },

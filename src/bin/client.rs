@@ -7,6 +7,7 @@ use tcg_2d::common::game_state::GameState;
 use tcg_2d::desk::DeskPlugins;
 use tcg_2d::menu::MenuPlugin;
 use tcg_2d::splash::SplashPlugin;
+use tcg_2d::utils::preview_plugins::PreviewPlugins;
 
 fn main() {
     let mut app = App::new();
@@ -30,6 +31,7 @@ fn main() {
     // 加载不同的插件
     app.add_plugins((
         TextInputPlugin,
+        PreviewPlugins,
         SplashPlugin,
         MenuPlugin,
         DeskPlugins,
