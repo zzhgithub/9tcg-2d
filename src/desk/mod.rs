@@ -38,7 +38,8 @@ fn setup(
 fn layout_back_button_and_content(
     mut commands: Commands,
     font: Handle<Font>,
-    back_action: DeskButtonActions,
+    state_scoped: impl States,
+    mut buttons: Box<[(&str, DeskButtonActions)]>,
     spawn_content: impl FnOnce(&mut ChildBuilder),
 ) {
     commands
@@ -49,7 +50,7 @@ fn layout_back_button_and_content(
                 flex_direction: FlexDirection::Column,
                 ..default()
             },
-            StateScoped(GameState::Desk),
+            StateScoped(state_scoped),
         ))
         .with_children(|parent| {
             parent
@@ -66,30 +67,32 @@ fn layout_back_button_and_content(
                     BackgroundColor(Color::srgb(1.0, 0.8, 0.6)),
                 ))
                 .with_children(|header| {
-                    header
-                        .spawn((
-                            back_action,
-                            Button,
-                            Node {
-                                width: Val::Px(80.),
-                                height: Val::Px(40.),
-                                align_items: AlignItems::Center,
-                                justify_content: JustifyContent::Center,
-                                ..default()
-                            },
-                            BackgroundColor(Color::srgb(1.0, 0.5, 0.0)),
-                        ))
-                        .with_children(|button| {
-                            button.spawn((
-                                Text::new("返回"),
-                                TextFont {
-                                    font: font.clone(),
-                                    font_size: 20.,
+                    for (text, action) in buttons.iter_mut() {
+                        header
+                            .spawn((
+                                action.clone(),
+                                Button,
+                                Node {
+                                    width: Val::Px(80.),
+                                    height: Val::Px(40.),
+                                    align_items: AlignItems::Center,
+                                    justify_content: JustifyContent::Center,
                                     ..default()
                                 },
-                                TextColor::WHITE,
-                            ));
-                        });
+                                BackgroundColor(Color::srgb(1.0, 0.5, 0.0)),
+                            ))
+                            .with_children(|button| {
+                                button.spawn((
+                                    Text::new(text.to_string()),
+                                    TextFont {
+                                        font: font.clone(),
+                                        font_size: 20.,
+                                        ..default()
+                                    },
+                                    TextColor::WHITE,
+                                ));
+                            });
+                    }
                 });
             // 内容区域
             parent

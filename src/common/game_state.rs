@@ -24,5 +24,6 @@ pub enum DeskState {
     #[default]
     Disable,
     List,
+    Desks,
     Detail,
 }

@@ -1,14 +1,10 @@
+use crate::common::game_state::DeskState;
 use crate::common::test_data::ALL_CARD;
 use crate::desk::desk_button_action::{DeskButtonActionState, DeskButtonActions};
 use crate::desk::layout_back_button_and_content;
 use crate::desk::scroll_list::scroll_list;
 use crate::utils::preview_plugins::ImagePreview;
-use bevy::a11y::AccessibilityNode;
 use bevy::prelude::*;
-use bevy::render::render_resource::encase::private::RuntimeSizedArray;
-use bevy::ui::FocusPolicy;
-use bevy::ui::widget::ImageNodeSize;
-use log::info;
 
 pub fn list_page(mut commands: Commands, asset_server: Res<AssetServer>) {
     let font = asset_server.load("fonts/wqy-microhei.ttc");
@@ -16,7 +12,8 @@ pub fn list_page(mut commands: Commands, asset_server: Res<AssetServer>) {
     layout_back_button_and_content(
         commands,
         font,
-        DeskButtonActions(DeskButtonActionState::BackToMenu),
+        DeskState::List,
+        Box::from([("返回", DeskButtonActions(DeskButtonActionState::BackToMenu))]),
         |plane| {
             //FIXME: 这里是测试使用的代码
             plane
