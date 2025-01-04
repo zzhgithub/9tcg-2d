@@ -4,6 +4,7 @@ use bevy::prelude::Component;
 pub enum DeskButtonActionState {
     BackToMenu,
     BackToList,
+    NewDesk,
 }
 
 #[derive(Component, Clone, Debug)]

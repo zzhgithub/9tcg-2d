@@ -1,9 +1,11 @@
 mod desk_button_action;
+mod desks;
 mod list;
 mod scroll_list;
 
 use crate::common::game_state::{DeskState, GameState, MenuState};
 use crate::desk::desk_button_action::{DeskButtonActionState, DeskButtonActions};
+use crate::desk::desks::{list_desks, setup_desks};
 use crate::desk::scroll_list::update_scroll_position;
 use crate::menu::menu_button_action::MenuButtonActions;
 use bevy::prelude::*;
@@ -20,8 +22,8 @@ impl Plugin for DeskPlugins {
             Update,
             (button_actions, update_scroll_position).run_if(in_state(GameState::Desk)),
         );
-
         app.add_systems(OnEnter(DeskState::List), list::list_page);
+        app.add_systems(OnEnter(DeskState::Desks), (setup_desks, list_desks).chain());
     }
 }
 
@@ -30,7 +32,7 @@ fn setup(
     asset_server: Res<AssetServer>,
     mut next_state: ResMut<NextState<DeskState>>,
 ) {
-    next_state.set(DeskState::List);
+    next_state.set(DeskState::Desks);
 }
 
 // 默认的布局页面
@@ -57,10 +59,10 @@ fn layout_back_button_and_content(
                 .spawn((
                     Node {
                         width: Val::Percent(100.),
-                        height: Val::Px(50.),
-                        justify_content: JustifyContent::Center,
-                        align_items: AlignItems::Baseline,
-                        flex_direction: FlexDirection::ColumnReverse,
+                        height: Val::Auto,
+                        flex_direction: FlexDirection::Row, // 水平排列子节点
+                        align_items: AlignItems::FlexStart, // 垂直对齐方式
+                        justify_content: JustifyContent::FlexStart, // 左对齐
                         padding: UiRect::all(Val::Px(10.0)),
                         ..default()
                     },
@@ -77,6 +79,7 @@ fn layout_back_button_and_content(
                                     height: Val::Px(40.),
                                     align_items: AlignItems::Center,
                                     justify_content: JustifyContent::Center,
+                                    margin: UiRect::all(Val::Px(2.0)),
                                     ..default()
                                 },
                                 BackgroundColor(Color::srgb(1.0, 0.5, 0.0)),
@@ -133,6 +136,10 @@ fn button_actions(
                 DeskButtonActionState::BackToList => {
                     info("Back to Desk list");
                     next_desk_state.set(DeskState::List);
+                }
+                DeskButtonActionState::NewDesk => {
+                    info!("New Desk page");
+                    //TODO
                 }
             }
         }
