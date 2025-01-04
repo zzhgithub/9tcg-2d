@@ -1,11 +1,13 @@
 mod desk_button_action;
 mod desks;
+mod detail;
 mod list;
 mod scroll_list;
 
 use crate::common::game_state::{DeskState, GameState, MenuState};
 use crate::desk::desk_button_action::{DeskButtonActionState, DeskButtonActions};
-use crate::desk::desks::{list_desks, setup_desks};
+use crate::desk::desks::{handel_click_desk, list_desks, setup_desks};
+use crate::desk::detail::{DeskSelect, open_desk_detail};
 use crate::desk::scroll_list::update_scroll_position;
 use crate::menu::menu_button_action::MenuButtonActions;
 use bevy::prelude::*;
@@ -23,7 +25,11 @@ impl Plugin for DeskPlugins {
             (button_actions, update_scroll_position).run_if(in_state(GameState::Desk)),
         );
         app.add_systems(OnEnter(DeskState::List), list::list_page);
+        // 卡组列表
         app.add_systems(OnEnter(DeskState::Desks), (setup_desks, list_desks).chain());
+        app.add_systems(Update, handel_click_desk.run_if(in_state(DeskState::Desks)));
+        // 详情
+        app.add_systems(OnEnter(DeskState::Detail), open_desk_detail);
     }
 }
 
@@ -33,6 +39,7 @@ fn setup(
     mut next_state: ResMut<NextState<DeskState>>,
 ) {
     next_state.set(DeskState::Desks);
+    commands.insert_resource(DeskSelect(None));
 }
 
 // 默认的布局页面
@@ -139,7 +146,15 @@ fn button_actions(
                 }
                 DeskButtonActionState::NewDesk => {
                     info!("New Desk page");
-                    //TODO
+                    next_desk_state.set(DeskState::Detail);
+                }
+                DeskButtonActionState::BackToDesk => {
+                    info!("Back to Desk list");
+                    next_desk_state.set(DeskState::Desks);
+                }
+                DeskButtonActionState::Save => {
+                    info!("Save Page");
+                    // todo 这要进行其他处理
                 }
             }
         }

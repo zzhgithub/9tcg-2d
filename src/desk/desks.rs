@@ -3,11 +3,15 @@
 use crate::common::desks_datas::{DeskData, DesksDataList};
 use crate::common::game_state::DeskState;
 use crate::desk::desk_button_action::{DeskButtonActionState, DeskButtonActions};
+use crate::desk::detail::DeskSelect;
 use crate::desk::layout_back_button_and_content;
 use crate::desk::scroll_list::scroll_list;
 use bevy::prelude::*;
 use bevy_persistent::{Persistent, StorageFormat};
 use std::path::Path;
+
+#[derive(Component)]
+pub struct DeskIndex(pub usize);
 
 // 初始化Desks
 pub fn setup_desks(mut commands: Commands) {
@@ -25,6 +29,7 @@ pub fn setup_desks(mut commands: Commands) {
                     name: "默认卡组".to_string(),
                     cards: vec!["S001-A-004".to_string()],
                 }],
+                used: 0,
             })
             .revertible(true)
             .revert_to_default_on_deserialization_errors(true)
@@ -59,7 +64,7 @@ pub fn list_desks(
                     }),
                 )
                 .with_children(|parent| {
-                    scroll_list(parent, list_array, 5, |row, t| {
+                    scroll_list(parent, list_array, 5, |row, t, index| {
                         let image = asset_server.load("desk/mu.png");
                         row.spawn((
                             ImageNode {
@@ -72,9 +77,20 @@ pub fn list_desks(
                                 align_items: AlignItems::Center,
                                 justify_content: JustifyContent::Center,
                                 padding: UiRect::all(Val::Px(5.0)),
+                                border: UiRect::all(Val::Px(2.0)),
                                 ..default()
                             },
                             Button,
+                            DeskIndex(index),
+                            Outline {
+                                width: Val::Px(5.),
+                                offset: Val::Px(5.),
+                                color: if index == desk_list.used {
+                                    Color::srgb(0.0, 1.0, 0.0)
+                                } else {
+                                    Color::NONE
+                                },
+                            },
                             Interaction::None,
                         ))
                         .insert(PickingBehavior {
@@ -97,4 +113,17 @@ pub fn list_desks(
                 });
         },
     );
+}
+
+pub fn handel_click_desk(
+    mut query: Query<(&Interaction, &mut DeskIndex), With<Button>>,
+    mut next_state: ResMut<NextState<DeskState>>,
+    mut desk_select: ResMut<DeskSelect>,
+) {
+    query.iter_mut().for_each(|(interaction, mut index)| {
+        if (*interaction == Interaction::Pressed) {
+            desk_select.0 = Some(index.0);
+            next_state.set(DeskState::Detail);
+        }
+    })
 }

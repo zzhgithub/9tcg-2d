@@ -11,7 +11,7 @@ pub fn scroll_list<T, F>(
     items_per_row: usize,
     mut callback: F,
 ) where
-    F: FnMut(&mut ChildBuilder, &T),
+    F: FnMut(&mut ChildBuilder, &T, usize),
 {
     parent
         .spawn((
@@ -51,7 +51,7 @@ pub fn scroll_list<T, F>(
                         // 便利每行
                         for i in 0..col_num {
                             let index = oi * items_per_row + i;
-                            callback(row, &list[index]);
+                            callback(row, &list[index], index);
                         }
                     });
             }

@@ -26,7 +26,7 @@ pub fn list_page(mut commands: Commands, asset_server: Res<AssetServer>) {
                     }),
                 )
                 .with_children(|parent| {
-                    scroll_list(parent, &ALL_CARD, 10, |row, &t| {
+                    scroll_list(parent, &ALL_CARD, 10, |row, &t, _index| {
                         let image = asset_server.load(format!("cards/{}.png", t));
                         row.spawn((
                             ImageNode {

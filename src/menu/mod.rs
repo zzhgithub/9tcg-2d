@@ -32,7 +32,8 @@ impl Plugin for MenuPlugin {
             OnEnter(GameState::Menu),
             (setup, play_menu_music.after(setup)),
         );
-        app.add_systems(OnExit(GameState::Menu), (stop_menu_music, disable));
+        // 这里只有到了游戏内才更改！
+        app.add_systems(OnEnter(GameState::Game), (stop_menu_music, disable));
         app.add_systems(
             Update,
             (toggle_quit, button_actions).run_if(in_state(GameState::Menu)),
