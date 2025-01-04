@@ -42,7 +42,7 @@ impl Plugin for MenuPlugin {
         app.add_systems(Update, quit_system.run_if(in_state(MenuState::Quit)));
         app.add_systems(OnEnter(MenuState::Settings), setup_setting);
         //FIXME: 这里可以提到全局
-        app.add_systems(Update, focus.before(TextInputSystem));
+        app.add_systems(Update, (focus, listen_ime_events).before(TextInputSystem));
     }
 }
 
@@ -493,10 +493,13 @@ fn spawn_label_input(
 
 fn focus(
     query: Query<(Entity, &Interaction), Changed<Interaction>>,
+    mut window: Single<&mut Window>,
     mut text_input_query: Query<(Entity, &mut TextInputInactive, &mut BorderColor)>,
 ) {
     for (interaction_entity, interaction) in &query {
         if *interaction == Interaction::Pressed {
+            window.ime_position = window.cursor_position().unwrap();
+            window.ime_enabled = true;
             for (entity, mut inactive, mut border_color) in &mut text_input_query {
                 if entity == interaction_entity {
                     inactive.0 = false;
@@ -505,6 +508,28 @@ fn focus(
                     inactive.0 = true;
                     *border_color = BORDER_COLOR_INACTIVE.into();
                 }
+            }
+        }
+    }
+}
+
+fn listen_ime_events(
+    mut events: EventReader<Ime>,
+    mut edit_text: Query<(&mut TextInputValue, &mut TextInputInactive)>,
+) {
+    for event in events.read() {
+        match event {
+            Ime::Commit { value, .. } => {
+                debug!("Commit {:?}", value);
+                for (mut text, inactive) in edit_text.iter_mut() {
+                    debug!("Commit {:?}", inactive.0);
+                    if !inactive.0 {
+                        text.0.push_str(value);
+                    }
+                }
+            }
+            _ => {
+                debug!("Ime event: {:?}", event);
             }
         }
     }
