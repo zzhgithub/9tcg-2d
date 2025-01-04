@@ -3,14 +3,14 @@
 use bevy::prelude::Resource;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize, Resource, Serialize)]
+#[derive(Debug, Deserialize, Resource, Serialize, Clone)]
 pub struct DesksDataList {
     pub list: Vec<DeskData>,
     // 默认使用的索引
     pub used: usize,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct DeskData {
     pub name: String,
     pub cards: Vec<String>,

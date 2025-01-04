@@ -7,7 +7,7 @@ mod scroll_list;
 use crate::common::game_state::{DeskState, GameState, MenuState};
 use crate::desk::desk_button_action::{DeskButtonActionState, DeskButtonActions};
 use crate::desk::desks::{handel_click_desk, list_desks, setup_desks};
-use crate::desk::detail::{DeskSelect, open_desk_detail};
+use crate::desk::detail::{CurrentDeskData, DeskSelect, open_desk_detail};
 use crate::desk::scroll_list::update_scroll_position;
 use crate::menu::menu_button_action::MenuButtonActions;
 use bevy::prelude::*;
@@ -40,6 +40,7 @@ fn setup(
 ) {
     next_state.set(DeskState::Desks);
     commands.insert_resource(DeskSelect(None));
+    commands.insert_resource(CurrentDeskData(None));
 }
 
 // 默认的布局页面
@@ -131,6 +132,8 @@ fn button_actions(
     >,
     mut next_desk_state: ResMut<NextState<DeskState>>,
     mut next_game_state: ResMut<NextState<GameState>>,
+    mut desk_select: ResMut<DeskSelect>,
+    mut current_desk_data: ResMut<CurrentDeskData>,
 ) {
     for (interaction, action) in interaction_query.iter() {
         if *interaction == Interaction::Pressed {
@@ -146,6 +149,8 @@ fn button_actions(
                 }
                 DeskButtonActionState::NewDesk => {
                     info!("New Desk page");
+                    desk_select.0 = None;
+                    current_desk_data.0 = None;
                     next_desk_state.set(DeskState::Detail);
                 }
                 DeskButtonActionState::BackToDesk => {

@@ -41,6 +41,7 @@ impl Plugin for MenuPlugin {
         app.add_systems(OnEnter(MenuState::Quit), quit_menu);
         app.add_systems(Update, quit_system.run_if(in_state(MenuState::Quit)));
         app.add_systems(OnEnter(MenuState::Settings), setup_setting);
+        //FIXME: 这里可以提到全局
         app.add_systems(Update, focus.before(TextInputSystem));
     }
 }
@@ -50,8 +51,10 @@ struct MenuMusicHandle(Handle<AudioSource>);
 
 fn play_menu_music(audio: Res<bevy_kira_audio::Audio>, music_handle: Res<MenuMusicHandle>) {
     // 播放背景音乐并循环
-    audio.play(music_handle.0.clone()).looped();
-    info!("Menu music started.");
+    if !audio.is_playing_sound() {
+        audio.play(music_handle.0.clone()).looped();
+        info!("Menu music started.");
+    }
 }
 
 fn stop_menu_music(audio: Res<bevy_kira_audio::Audio>) {
