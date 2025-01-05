@@ -3,9 +3,10 @@ use crate::common::game_state::DeskState;
 use crate::common::test_data::{ALL_CARD, ALL_CARD_ONCE};
 use crate::desk::desk_button_action::{DeskButtonActionState, DeskButtonActions};
 use crate::desk::layout_back_button_and_content;
-use crate::desk::scroll_list::scroll_list;
+use crate::desk::scroll_list::{scroll_list, table_t};
 use crate::utils::preview_plugins::ImagePreview;
 use bevy::prelude::*;
+use bevy::text::cosmic_text::Motion::Next;
 use bevy::ui::FocusPolicy;
 use bevy_persistent::Persistent;
 use bevy_simple_text_input::{
@@ -26,6 +27,9 @@ pub struct DeskSelect(pub Option<usize>);
 #[derive(Resource)]
 pub struct CurrentDeskData(pub Option<DeskData>);
 
+#[derive(Component)]
+pub struct DeskPlane;
+
 pub fn open_desk_detail(
     mut commands: Commands,
     desk_list: Res<Persistent<DesksDataList>>,
@@ -42,7 +46,10 @@ pub fn open_desk_detail(
         commands.insert_resource(CurrentDeskData(Some(list_array[selected].clone())));
         name = list_array[selected].name.clone();
     } else {
-        commands.insert_resource(CurrentDeskData(None));
+        commands.insert_resource(CurrentDeskData(Some(DeskData {
+            name: name.clone(),
+            cards: vec!["S001-A-001".to_string()],
+        })));
     }
     let font = asset_server.load("fonts/wqy-microhei.ttc");
     layout_back_button_and_content(
@@ -51,7 +58,7 @@ pub fn open_desk_detail(
         DeskState::Detail,
         Box::from([
             ("返回", DeskButtonActions(DeskButtonActionState::BackToDesk)),
-            ("Save", DeskButtonActions(DeskButtonActionState::NewDesk)),
+            ("Save", DeskButtonActions(DeskButtonActionState::Save)),
         ]),
         |plane| {
             plane
@@ -98,7 +105,7 @@ pub fn open_desk_detail(
                                 },
                                 TextInputInactive(true),
                                 FocusPolicy::Block,
-                                TextInputValue(name),
+                                TextInputValue(name.clone()),
                                 TextInputTextColor(TextColor(Color::BLACK)),
                             ));
                         });
@@ -121,45 +128,36 @@ pub fn open_desk_detail(
                         .with_children(|parent| {
                             // 左边卡组
                             parent
-                                .spawn(
-                                    (Node {
-                                        width: Val::Percent(70.0),
-                                        height: Val::Percent(90.0),
-                                        justify_content: JustifyContent::Center,
-                                        ..Default::default()
-                                    }),
-                                )
+                                .spawn((Node {
+                                    width: Val::Percent(70.0),
+                                    height: Val::Percent(90.0),
+                                    justify_content: JustifyContent::Center,
+                                    ..Default::default()
+                                },))
                                 .with_children(|content_plane| {
-                                    let cards = if let Some(current) = current {
-                                        &current.cards.clone()
-                                    } else {
-                                        // 第一次创建 默认卡组第一张卡
-                                        &vec!["S001-A-001".to_string()]
-                                    };
-                                    scroll_list(content_plane, cards, 7, |row, t, _index| {
-                                        let image = asset_server.load(format!("cards/{}.png", t));
-                                        row.spawn((
-                                            ImageNode {
-                                                image: image.clone(),
-                                                ..default()
-                                            },
+                                    content_plane
+                                        .spawn((
                                             Node {
-                                                width: Val::Percent(100.0 / 7.0),
-                                                padding: UiRect::all(Val::Px(2.0)),
+                                                display: Display::Flex,
+                                                width: Val::Percent(96.),
+                                                height: Val::Percent(93.),
+                                                flex_direction: FlexDirection::Column,
+                                                margin: UiRect::all(Val::Px(5.)),
+                                                overflow: Overflow::scroll_y(),
                                                 ..default()
                                             },
-                                            BorderRadius::all(Val::Px(2.0)),
-                                            Button,
-                                            Interaction::None,
-                                            ImagePreview(image.clone()),
+                                            BackgroundColor(Color::NONE),
+                                            DeskPlane,
                                         ))
-                                        .insert(
-                                            PickingBehavior {
-                                                should_block_lower: false,
-                                                ..default()
-                                            },
-                                        );
-                                    });
+                                        .with_children(|content_plane| {
+                                            let cards = if let Some(current) = current {
+                                                &current.cards.clone()
+                                            } else {
+                                                // 第一次创建 默认卡组第一张卡
+                                                &vec!["S001-A-001".to_string()]
+                                            };
+                                            spawn_desks(content_plane, &cards, &asset_server);
+                                        });
                                 });
                             // 右边搜索
                             parent
@@ -195,7 +193,9 @@ pub fn open_desk_detail(
                                                 Button,
                                                 Interaction::None,
                                                 ImagePreview(image.clone()),
+                                                CardCode(String::from(*t)),
                                             ))
+                                            .observe(on_right_click)
                                             .insert(
                                                 PickingBehavior {
                                                     should_block_lower: false,
@@ -209,4 +209,102 @@ pub fn open_desk_detail(
                 });
         },
     );
+}
+
+pub fn spawn_desks<T: std::fmt::Display>(
+    mut content_plane: &mut ChildBuilder,
+    cards: &[T],
+    asset_server: &Res<AssetServer>,
+) {
+    table_t(content_plane, cards, 7, |row, t, index| {
+        let image = asset_server.load(format!("cards/{}.png", t));
+        row.spawn((
+            ImageNode {
+                image: image.clone(),
+                ..default()
+            },
+            Node {
+                width: Val::Percent(100.0 / 7.0),
+                padding: UiRect::all(Val::Px(2.0)),
+                ..default()
+            },
+            BorderRadius::all(Val::Px(2.0)),
+            Button,
+            Interaction::None,
+            ImagePreview(image.clone()),
+            CardIndex(index),
+        ))
+        .observe(on_right_click_remove)
+        .insert(PickingBehavior {
+            should_block_lower: false,
+            ..default()
+        });
+    });
+}
+
+#[derive(Debug, Component)]
+pub struct CardCode(pub String);
+#[derive(Debug, Component)]
+pub struct CardIndex(pub usize);
+
+pub fn on_right_click_remove(
+    click: Trigger<Pointer<Click>>,
+    mut query: Query<&mut CardIndex>,
+    mut current_data: ResMut<CurrentDeskData>,
+) {
+    if let Ok(mut card_index) = query.get_mut(click.entity()) {
+        info!("Clicked on cardIndex {}", card_index.0);
+        debug!("Event {:?}", click.event);
+        if click.button == PointerButton::Secondary {
+            // 鼠标左键
+            if let Some(mut desk) = current_data.0.clone() {
+                desk.cards.remove(card_index.0);
+                current_data.0 = Some(desk);
+            }
+        }
+    }
+}
+
+pub fn on_right_click(
+    click: Trigger<Pointer<Click>>,
+    mut query: Query<&mut CardCode>,
+    mut current_data: ResMut<CurrentDeskData>,
+) {
+    if let Ok(mut card_code) = query.get_mut(click.entity()) {
+        info!("Clicked on cardcode {}", card_code.0);
+        debug!("Event {:?}", click.event);
+        if click.button == PointerButton::Secondary {
+            // 鼠标左键
+            if let Some(mut desk) = current_data.0.clone() {
+                desk.cards.push(card_code.0.clone());
+                current_data.0 = Some(desk);
+            }
+        }
+    }
+}
+
+pub fn on_data_changed(
+    current_data: Res<CurrentDeskData>,
+    query: Single<(Entity, &Children), With<DeskPlane>>,
+    child_query: Query<Entity, With<Parent>>,
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
+    if current_data.is_changed() {
+        info!("Changed");
+        let (entity, children) = query.into_inner();
+        for &child in children.iter() {
+            if child_query.get(child).is_ok() {
+                commands.entity(child).despawn_recursive();
+            }
+        }
+        // 重新刷新数据
+        if let Some(mut parent) = commands.get_entity(entity) {
+            if let Some(mut desk) = current_data.0.clone() {
+                parent.with_children(|parent| {
+                    spawn_desks(parent, &desk.cards, &asset_server);
+                });
+            }
+        }
+    }
 }

@@ -27,34 +27,7 @@ pub fn scroll_list<T, F>(
             BackgroundColor(Color::NONE),
         ))
         .with_children(|parent| {
-            let last_item = list.len() % items_per_row;
-            let row_num = list.len() / items_per_row + if (last_item != 0) { 1 } else { 0 };
-
-            for oi in 0..row_num {
-                parent
-                    .spawn(
-                        (Node {
-                            flex_direction: FlexDirection::Row,
-                            ..default()
-                        }),
-                    )
-                    .insert(PickingBehavior {
-                        should_block_lower: false,
-                        ..default()
-                    })
-                    .with_children(|row| {
-                        let col_num = if (oi == row_num - 1 && last_item != 0) {
-                            last_item
-                        } else {
-                            items_per_row
-                        };
-                        // 便利每行
-                        for i in 0..col_num {
-                            let index = oi * items_per_row + i;
-                            callback(row, &list[index], index);
-                        }
-                    });
-            }
+            table_t(parent, list, items_per_row, &mut callback);
         });
 }
 
@@ -77,5 +50,39 @@ pub fn update_scroll_position(
                 }
             }
         }
+    }
+}
+
+pub fn table_t<T, F>(parent: &mut ChildBuilder, list: &[T], items_per_row: usize, mut callback: F)
+where
+    F: FnMut(&mut ChildBuilder, &T, usize),
+{
+    let last_item = list.len() % items_per_row;
+    let row_num = list.len() / items_per_row + if (last_item != 0) { 1 } else { 0 };
+
+    for oi in 0..row_num {
+        parent
+            .spawn(
+                (Node {
+                    flex_direction: FlexDirection::Row,
+                    ..default()
+                }),
+            )
+            .insert(PickingBehavior {
+                should_block_lower: false,
+                ..default()
+            })
+            .with_children(|row| {
+                let col_num = if (oi == row_num - 1 && last_item != 0) {
+                    last_item
+                } else {
+                    items_per_row
+                };
+                // 便利每行
+                for i in 0..col_num {
+                    let index = oi * items_per_row + i;
+                    callback(row, &list[index], index);
+                }
+            });
     }
 }

@@ -7,7 +7,7 @@ mod scroll_list;
 use crate::common::game_state::{DeskState, GameState, MenuState};
 use crate::desk::desk_button_action::{DeskButtonActionState, DeskButtonActions};
 use crate::desk::desks::{handel_click_desk, list_desks, setup_desks};
-use crate::desk::detail::{CurrentDeskData, DeskSelect, open_desk_detail};
+use crate::desk::detail::{CurrentDeskData, DeskSelect, on_data_changed, open_desk_detail};
 use crate::desk::scroll_list::update_scroll_position;
 use crate::menu::menu_button_action::MenuButtonActions;
 use bevy::prelude::*;
@@ -30,6 +30,7 @@ impl Plugin for DeskPlugins {
         app.add_systems(Update, handel_click_desk.run_if(in_state(DeskState::Desks)));
         // 详情
         app.add_systems(OnEnter(DeskState::Detail), open_desk_detail);
+        app.add_systems(Update, on_data_changed.run_if(in_state(DeskState::Detail)));
     }
 }
 
