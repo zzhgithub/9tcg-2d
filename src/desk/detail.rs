@@ -106,6 +106,7 @@ pub fn open_desk_detail(
                                 TextInputInactive(true),
                                 FocusPolicy::Block,
                                 TextInputValue(name.clone()),
+                                DeskNameInput,
                                 TextInputTextColor(TextColor(Color::BLACK)),
                             ));
                         });
@@ -246,6 +247,8 @@ pub fn spawn_desks<T: std::fmt::Display>(
 pub struct CardCode(pub String);
 #[derive(Debug, Component)]
 pub struct CardIndex(pub usize);
+#[derive(Debug, Component)]
+pub struct DeskNameInput;
 
 pub fn on_right_click_remove(
     click: Trigger<Pointer<Click>>,

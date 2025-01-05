@@ -4,14 +4,19 @@ mod detail;
 mod list;
 mod scroll_list;
 
+use crate::common::desks_datas::DesksDataList;
 use crate::common::game_state::{DeskState, GameState, MenuState};
 use crate::desk::desk_button_action::{DeskButtonActionState, DeskButtonActions};
 use crate::desk::desks::{handel_click_desk, list_desks, setup_desks};
-use crate::desk::detail::{CurrentDeskData, DeskSelect, on_data_changed, open_desk_detail};
+use crate::desk::detail::{
+    CurrentDeskData, DeskNameInput, DeskSelect, on_data_changed, open_desk_detail,
+};
 use crate::desk::scroll_list::update_scroll_position;
 use crate::menu::menu_button_action::MenuButtonActions;
 use bevy::prelude::*;
 use bevy::utils::info;
+use bevy_persistent::Persistent;
+use bevy_simple_text_input::TextInputValue;
 
 pub struct DeskPlugins;
 
@@ -19,14 +24,14 @@ impl Plugin for DeskPlugins {
     fn build(&self, app: &mut App) {
         app.init_state::<DeskState>();
         app.enable_state_scoped_entities::<DeskState>();
-        app.add_systems(OnEnter(GameState::Desk), setup);
+        app.add_systems(OnEnter(GameState::Desk), (setup, setup_desks));
         app.add_systems(
             Update,
             (button_actions, update_scroll_position).run_if(in_state(GameState::Desk)),
         );
         app.add_systems(OnEnter(DeskState::List), list::list_page);
         // 卡组列表
-        app.add_systems(OnEnter(DeskState::Desks), (setup_desks, list_desks).chain());
+        app.add_systems(OnEnter(DeskState::Desks), list_desks);
         app.add_systems(Update, handel_click_desk.run_if(in_state(DeskState::Desks)));
         // 详情
         app.add_systems(OnEnter(DeskState::Detail), open_desk_detail);
@@ -135,6 +140,9 @@ fn button_actions(
     mut next_game_state: ResMut<NextState<GameState>>,
     mut desk_select: ResMut<DeskSelect>,
     mut current_desk_data: ResMut<CurrentDeskData>,
+    mut query_name: Query<&TextInputValue, With<DeskNameInput>>,
+    mut desks_data_list: ResMut<Persistent<DesksDataList>>,
+    mut commands: Commands,
 ) {
     for (interaction, action) in interaction_query.iter() {
         if *interaction == Interaction::Pressed {
@@ -160,7 +168,29 @@ fn button_actions(
                 }
                 DeskButtonActionState::Save => {
                     info!("Save Page");
-                    // todo 这要进行其他处理
+                    //  这要进行保存处理
+                    if let Some(mut desk_data) = current_desk_data.0.clone() {
+                        for input in &mut query_name {
+                            desk_data.name = input.0.clone();
+                        }
+                        if let Some(desk_selected) = desk_select.0 {
+                            // 更新数据
+                            desks_data_list
+                                .update(|desk_list| {
+                                    desk_list.list[desk_selected] = desk_data.clone();
+                                })
+                                .expect("Desk Update Fail!");
+                        } else {
+                            // 新增数据
+                            desks_data_list
+                                .update(|desk_list| {
+                                    desk_list.list.push(desk_data.clone());
+                                    commands
+                                        .insert_resource(DeskSelect(Some(desk_list.list.len())));
+                                })
+                                .expect("Desk Add Fail!");
+                        }
+                    }
                 }
             }
         }
