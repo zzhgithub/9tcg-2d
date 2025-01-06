@@ -182,14 +182,25 @@ fn button_actions(
                                 .expect("Desk Update Fail!");
                         } else {
                             // 新增数据
-                            desks_data_list
-                                .update(|desk_list| {
-                                    desk_list.list.push(desk_data.clone());
-                                    commands
-                                        .insert_resource(DeskSelect(Some(desk_list.list.len())));
-                                })
-                                .expect("Desk Add Fail!");
+                            if let Ok(a) = desks_data_list.update(|desk_list| {
+                                desk_list.list.push(desk_data.clone());
+                            }) {
+                                // 设置成当前选择
+                                commands.insert_resource(DeskSelect(Some(
+                                    desks_data_list.list.len() - 1,
+                                )));
+                            }
                         }
+                    }
+                }
+                // 更新选中数据
+                DeskButtonActionState::Use => {
+                    if let Some(select) = desk_select.0 {
+                        desks_data_list
+                            .update(|desk_list| {
+                                desk_list.used = select;
+                            })
+                            .expect("Desk Select Update Fail!");
                     }
                 }
             }

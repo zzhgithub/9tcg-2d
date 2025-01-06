@@ -59,6 +59,7 @@ pub fn open_desk_detail(
         Box::from([
             ("返回", DeskButtonActions(DeskButtonActionState::BackToDesk)),
             ("Save", DeskButtonActions(DeskButtonActionState::Save)),
+            ("Use!", DeskButtonActions(DeskButtonActionState::Use)),
         ]),
         |plane| {
             plane

@@ -7,6 +7,7 @@ pub enum DeskButtonActionState {
     BackToDesk,
     NewDesk,
     Save,
+    Use,
 }
 
 #[derive(Component, Clone, Debug)]

@@ -64,7 +64,7 @@ pub fn list_desks(
                     }),
                 )
                 .with_children(|parent| {
-                    scroll_list(parent, list_array, 5, |row, t, index| {
+                    scroll_list(parent, list_array, 6, |row, t, index| {
                         let image = asset_server.load("desk/mu.png");
                         row.spawn((
                             ImageNode {
