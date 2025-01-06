@@ -6,6 +6,7 @@ use crate::desk::desk_button_action::{DeskButtonActionState, DeskButtonActions};
 use crate::desk::detail::DeskSelect;
 use crate::desk::layout_back_button_and_content;
 use crate::desk::scroll_list::scroll_list;
+use bevy::core_pipeline::bloom::Bloom;
 use bevy::prelude::*;
 use bevy_persistent::{Persistent, StorageFormat};
 use std::path::Path;
@@ -77,7 +78,7 @@ pub fn list_desks(
                                 align_items: AlignItems::Center,
                                 justify_content: JustifyContent::Center,
                                 padding: UiRect::all(Val::Px(5.0)),
-                                border: UiRect::all(Val::Px(2.0)),
+                                margin: UiRect::all(Val::Px(5.0)),
                                 ..default()
                             },
                             Button,

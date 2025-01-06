@@ -1,5 +1,6 @@
 // 公共
 pub mod common;
+pub mod core;
 pub mod desk;
 pub mod menu;
 pub mod splash;

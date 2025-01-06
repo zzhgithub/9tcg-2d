@@ -27,7 +27,7 @@ pub fn list_page(mut commands: Commands, asset_server: Res<AssetServer>) {
                 )
                 .with_children(|parent| {
                     scroll_list(parent, &ALL_CARD, 10, |row, &t, _index| {
-                        let image = asset_server.load(format!("cards/{}.png", t));
+                        let image = asset_server.load(format!("cards/min/{}.png", t));
                         row.spawn((
                             ImageNode {
                                 image: image.clone(),
@@ -41,7 +41,7 @@ pub fn list_page(mut commands: Commands, asset_server: Res<AssetServer>) {
                             BorderRadius::all(Val::Px(2.0)),
                             Button,
                             Interaction::None,
-                            ImagePreview(image.clone()),
+                            ImagePreview(format!("{}", t)),
                         ))
                         .insert(PickingBehavior {
                             should_block_lower: false,

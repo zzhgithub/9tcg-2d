@@ -4,7 +4,7 @@ use bevy::prelude::*;
 pub struct PreviewPlugins;
 
 #[derive(Component)]
-pub struct ImagePreview(pub Handle<Image>);
+pub struct ImagePreview(pub String);
 
 #[derive(Resource)]
 struct LongPressTimer(Timer);
@@ -111,6 +111,7 @@ fn check_long_press(
     mut query: Query<(&Interaction, &mut ImagePreview), With<Button>>,
     mut image_stage: ResMut<ImageStage>,
     mut next_state: ResMut<NextState<PreviewState>>,
+    asset_server: Res<AssetServer>,
 ) {
     // 当前状态是啥状态啊？
     if timer.0.tick(time.delta()).just_finished() {
@@ -120,7 +121,8 @@ fn check_long_press(
             if *interaction == Interaction::Pressed {
                 debug!("on Button Pressed");
                 // 处理长按事件
-                image_stage.0 = Some(preview.0.clone());
+                let image = asset_server.load(format!("cards/{}.png", preview.0));
+                image_stage.0 = Some(image);
                 next_state.set(PreviewState::Show);
             }
         }

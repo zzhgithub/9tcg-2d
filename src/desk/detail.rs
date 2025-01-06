@@ -180,7 +180,7 @@ pub fn open_desk_detail(
                                         3,
                                         |row, t, _index| {
                                             let image =
-                                                asset_server.load(format!("cards/{}.png", t));
+                                                asset_server.load(format!("cards/min/{}.png", t));
                                             row.spawn((
                                                 ImageNode {
                                                     image: image.clone(),
@@ -194,7 +194,7 @@ pub fn open_desk_detail(
                                                 BorderRadius::all(Val::Px(2.0)),
                                                 Button,
                                                 Interaction::None,
-                                                ImagePreview(image.clone()),
+                                                ImagePreview(format!("{}", t)),
                                                 CardCode(String::from(*t)),
                                             ))
                                             .observe(on_right_click)
@@ -219,7 +219,7 @@ pub fn spawn_desks<T: std::fmt::Display>(
     asset_server: &Res<AssetServer>,
 ) {
     table_t(content_plane, cards, 7, |row, t, index| {
-        let image = asset_server.load(format!("cards/{}.png", t));
+        let image = asset_server.load(format!("cards/min/{}.png", t));
         row.spawn((
             ImageNode {
                 image: image.clone(),
@@ -233,7 +233,7 @@ pub fn spawn_desks<T: std::fmt::Display>(
             BorderRadius::all(Val::Px(2.0)),
             Button,
             Interaction::None,
-            ImagePreview(image.clone()),
+            ImagePreview(format!("{}", t)),
             CardIndex(index),
         ))
         .observe(on_right_click_remove)
