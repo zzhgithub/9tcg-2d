@@ -5,6 +5,7 @@ use bevy_kira_audio::AudioPlugin;
 use bevy_simple_text_input::TextInputPlugin;
 use tcg_2d::common::game_state::GameState;
 use tcg_2d::desk::DeskPlugins;
+use tcg_2d::duel::DuelPlugin;
 use tcg_2d::menu::MenuPlugin;
 use tcg_2d::splash::SplashPlugin;
 use tcg_2d::utils::preview_plugins::PreviewPlugins;
@@ -35,6 +36,7 @@ fn main() {
         SplashPlugin,
         MenuPlugin,
         DeskPlugins,
+        DuelPlugin,
         WorldInspectorPlugin::new(),
     ));
 

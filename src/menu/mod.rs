@@ -309,6 +309,7 @@ fn button_actions(
                 }
                 MenuButtonActionState::Duel => {
                     info!("Click On Duel!");
+                    next_game_state.set(GameState::Game);
                 }
                 MenuButtonActionState::Save => {
                     info!("Click On Save!");

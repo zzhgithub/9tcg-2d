@@ -2,6 +2,7 @@
 pub mod common;
 pub mod core;
 pub mod desk;
+pub mod duel;
 pub mod menu;
 pub mod splash;
 pub mod utils;
