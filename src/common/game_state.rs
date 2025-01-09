@@ -27,3 +27,12 @@ pub enum DeskState {
     Desks,
     Detail,
 }
+
+#[derive(PartialEq, Clone, Eq, Copy, Default, Debug, Hash, States)]
+pub enum DuelState {
+    #[default]
+    Disable,
+    Main,
+    Connecting,
+    Connected,
+}

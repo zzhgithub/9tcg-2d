@@ -6,7 +6,7 @@ pub type DuelEvent = GgrsConfig<ActionEvent>;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub struct ActionEvent {
-    action: ActionType,
+    pub action: ActionType,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]

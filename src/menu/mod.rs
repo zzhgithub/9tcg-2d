@@ -3,6 +3,7 @@ pub mod menu_button_action;
 use crate::common::game_state::{GameState, MenuState};
 use crate::common::settings::{PortNameInput, ServiceNameInput, Settings};
 use crate::menu::menu_button_action::{MenuButtonActionState, MenuButtonActions};
+use crate::utils::{BACKGROUND_COLOR, BORDER_COLOR_ACTIVE, BORDER_COLOR_INACTIVE, COLOR_BUTTON};
 use bevy::app::App;
 use bevy::asset::AssetServer;
 use bevy::prelude::*;
@@ -18,12 +19,6 @@ use std::path::Path;
 pub struct MenuPlugin;
 #[derive(Component)]
 pub struct QuitButton;
-const COLOR_BUTTON: Color = Color::srgb(1.0, 0.5, 0.0);
-const BORDER_COLOR_INACTIVE: Color = Color::srgb(0.25, 0.25, 0.25);
-
-const BORDER_COLOR_ACTIVE: Color = Color::srgb(0.75, 0.52, 0.99);
-const TEXT_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
-const BACKGROUND_COLOR: Color = Color::WHITE;
 impl Plugin for MenuPlugin {
     fn build(&self, app: &mut App) {
         app.init_state::<MenuState>();

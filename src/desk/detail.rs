@@ -5,6 +5,7 @@ use crate::desk::desk_button_action::{DeskButtonActionState, DeskButtonActions};
 use crate::desk::layout_back_button_and_content;
 use crate::desk::scroll_list::{scroll_list, table_t};
 use crate::utils::preview_plugins::ImagePreview;
+use crate::utils::{BACKGROUND_COLOR, BORDER_COLOR_ACTIVE};
 use bevy::prelude::*;
 use bevy::text::cosmic_text::Motion::Next;
 use bevy::ui::FocusPolicy;
@@ -13,13 +14,6 @@ use bevy_simple_text_input::{
     TextInput, TextInputInactive, TextInputSettings, TextInputTextColor, TextInputTextFont,
     TextInputValue,
 };
-
-const COLOR_BUTTON: Color = Color::srgb(1.0, 0.5, 0.0);
-const BORDER_COLOR_INACTIVE: Color = Color::srgb(0.25, 0.25, 0.25);
-
-const BORDER_COLOR_ACTIVE: Color = Color::srgb(0.75, 0.52, 0.99);
-const TEXT_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
-const BACKGROUND_COLOR: Color = Color::WHITE;
 
 #[derive(Debug, Resource)]
 pub struct DeskSelect(pub Option<usize>);
@@ -218,7 +212,7 @@ pub fn spawn_desks<T: std::fmt::Display>(
     cards: &[T],
     asset_server: &Res<AssetServer>,
 ) {
-    table_t(content_plane, cards, 7, |row, t, index| {
+    table_t(content_plane, cards, 10, |row, t, index| {
         let image = asset_server.load(format!("cards/min/{}.png", t));
         row.spawn((
             ImageNode {
@@ -226,7 +220,7 @@ pub fn spawn_desks<T: std::fmt::Display>(
                 ..default()
             },
             Node {
-                width: Val::Percent(100.0 / 7.0),
+                width: Val::Percent(100.0 / 10.0),
                 padding: UiRect::all(Val::Px(2.0)),
                 ..default()
             },

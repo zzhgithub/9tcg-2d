@@ -6,7 +6,6 @@ use crate::desk::desk_button_action::{DeskButtonActionState, DeskButtonActions};
 use crate::desk::detail::DeskSelect;
 use crate::desk::layout_back_button_and_content;
 use crate::desk::scroll_list::scroll_list;
-use bevy::core_pipeline::bloom::Bloom;
 use bevy::prelude::*;
 use bevy_persistent::{Persistent, StorageFormat};
 use std::path::Path;
