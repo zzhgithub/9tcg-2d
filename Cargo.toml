@@ -52,4 +52,4 @@ serde = "1.0.217"
 dirs = { version = "5.0" }
 bevy_simple_text_input = "0.10.0"
 bevy-inspector-egui = "0.28.0"
-rand = "0.8.5"
+bevy_ggrs = "0.17.0"

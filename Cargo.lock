@@ -696,6 +696,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_ggrs"
+version = "0.17.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "03bffc1632fc3b2256f057804e97e027cc7ce7c28ecd90505c00cb36ae2caedd"
+dependencies = [
+ "bevy",
+ "disqualified",
+ "ggrs",
+ "log",
+ "seahash",
+ "serde",
+]
+
+[[package]]
 name = "bevy_gilrs"
 version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1439,6 +1453,16 @@ name = "bit-vec"
 version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5e764a1d40d510daf35e07be9eb06e75770908c27d411ee6c92109c9840eaaf7"
+
+[[package]]
+name = "bitfield-rle"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "215d5574bfd0d6d9243a9c741690f0b7ee8a0f39d3195283779793ed46d984e1"
+dependencies = [
+ "anyhow",
+ "varinteger",
+]
 
 [[package]]
 name = "bitflags"
@@ -2362,6 +2386,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "ggrs"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6961c572ec0692fd73a31f335db5e8b92b165c4d43e180ae0aaa64411d9baeb9"
+dependencies = [
+ "bincode",
+ "bitfield-rle",
+ "instant",
+ "js-sys",
+ "parking_lot",
+ "rand",
+ "serde",
+ "tracing",
+]
+
+[[package]]
 name = "gilrs"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2832,6 +2872,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e05c02b5e89bff3b946cedeca278abc628fe811e604f027c45a8aa3cf793d0eb"
 dependencies = [
  "libc",
+]
+
+[[package]]
+name = "instant"
+version = "0.1.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e0242819d153cba4b4b05a5a8f2a7e9bbf97b6055b2a002b395c96b5ff3c0222"
+dependencies = [
+ "cfg-if",
 ]
 
 [[package]]
@@ -4078,6 +4127,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "seahash"
+version = "4.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1c107b6f4780854c8b126e228ea8869f4d7b71260f962fefb57b996b8959ba6b"
+
+[[package]]
 name = "self_cell"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4441,10 +4496,10 @@ dependencies = [
  "bevy",
  "bevy-inspector-egui",
  "bevy-persistent",
+ "bevy_ggrs",
  "bevy_kira_audio",
  "bevy_simple_text_input",
  "dirs",
- "rand",
  "serde",
 ]
 
@@ -4837,6 +4892,12 @@ name = "valuable"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "830b7e5d4d90034032940e4ace0d9a9a057e7a45cd94e6c007832e39edb82f6d"
+
+[[package]]
+name = "varinteger"
+version = "1.0.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7ea29db9f94ff08bb619656b8120878f280526f71dc88b5262c958a510181812"
 
 [[package]]
 name = "vec_map"
