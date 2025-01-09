@@ -1,8 +1,5 @@
 use crate::core::process::ProcessState;
-use bevy_ggrs::GgrsConfig;
 use serde::{Deserialize, Serialize};
-
-pub type DuelEvent = GgrsConfig<ActionEvent>;
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub struct ActionEvent {

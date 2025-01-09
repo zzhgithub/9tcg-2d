@@ -4,6 +4,10 @@
 cargo run --release --bin client
 ```
 
+```shell
+cargo run --bin client
+cargo run --bin client
+```
 
 
 # 人物表

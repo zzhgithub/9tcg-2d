@@ -37,7 +37,7 @@ fn main() {
         MenuPlugin,
         DeskPlugins,
         DuelPlugin,
-        WorldInspectorPlugin::new(),
+        // WorldInspectorPlugin::new(),
     ));
 
     app.run();
