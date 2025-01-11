@@ -80,7 +80,7 @@ fn setup(
             .path(config_dir.join("key-bindings.toml"))
             .default(Settings {
                 service: "127.0.0.1".to_string(),
-                port: "28892".to_string(),
+                port: "7000".to_string(),
                 ext_dir: "./ext".to_string(),
             })
             .revertible(true)

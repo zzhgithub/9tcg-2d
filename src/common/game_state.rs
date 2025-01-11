@@ -35,4 +35,6 @@ pub enum DuelState {
     Main,
     Connecting,
     Connected,
+    InGame,
+    ErrorPage,
 }

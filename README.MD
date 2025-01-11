@@ -2,11 +2,12 @@
 
 ```shell
 cargo run --release --bin client
+cargo run --release --bin server
 ```
 
 ```shell
 cargo run --bin client
-cargo run --bin client
+cargo run --bin server
 ```
 
 

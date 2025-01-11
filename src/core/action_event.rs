@@ -1,11 +1,15 @@
 use crate::core::process::ProcessState;
+use bevy::prelude::App;
+use bevy_eventwork::NetworkMessage;
+use bevy_eventwork::tcp::TcpProvider;
 use serde::{Deserialize, Serialize};
 
+#[deprecated]
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub struct ActionEvent {
     pub action: ActionType,
 }
-
+#[deprecated]
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
 pub enum ActionType {
     #[default]
@@ -33,3 +37,37 @@ pub enum ActionType {
 }
 
 // 谁 目标 操作 内容
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ToServerMessage {
+    pub debug_message: String,
+}
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ToClientMessage {
+    pub debug_message: String,
+}
+
+impl NetworkMessage for ToServerMessage {
+    const NAME: &'static str = "tcg:ToServerMessage";
+}
+
+impl NetworkMessage for ToClientMessage {
+    const NAME: &'static str = "tcg:ToClientMessage";
+}
+
+#[allow(unused)]
+pub fn client_register_network_messages(app: &mut App) {
+    use bevy_eventwork::AppNetworkMessage;
+
+    // The client registers messages that arrives from the server, so that
+    // it is prepared to handle them. Otherwise, an error occurs.
+    app.listen_for_message::<ToClientMessage, TcpProvider>();
+}
+
+#[allow(unused)]
+pub fn server_register_network_messages(app: &mut App) {
+    use bevy_eventwork::AppNetworkMessage;
+
+    // The server registers messages that arrives from a client, so that
+    // it is prepared to handle them. Otherwise, an error occurs.
+    app.listen_for_message::<ToServerMessage, TcpProvider>();
+}

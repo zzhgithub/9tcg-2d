@@ -50,5 +50,7 @@ bevy_kira_audio = { version = "0.22.0", features = ["mp3"] }
 bevy-persistent = { version = "0.7.0", features = ["all"] }
 serde = "1.0.217"
 dirs = { version = "5.0.1" }
-bevy_simple_text_input = "0.10.0"
+bevy_simple_text_input = "0.10.1"
 bevy-inspector-egui = "0.28.0"
+bevy_eventwork = "0.10.0"
+async-net = "2.0.0"
