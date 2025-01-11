@@ -1,6 +1,6 @@
 mod desk_button_action;
 mod desks;
-mod detail;
+pub mod detail;
 mod list;
 mod scroll_list;
 
@@ -24,7 +24,9 @@ impl Plugin for DeskPlugins {
     fn build(&self, app: &mut App) {
         app.init_state::<DeskState>();
         app.enable_state_scoped_entities::<DeskState>();
-        app.add_systems(OnEnter(GameState::Desk), (setup, setup_desks));
+        // 进入到公共方法
+        app.add_systems(Startup, setup_desks);
+        app.add_systems(OnEnter(GameState::Desk), setup);
         app.add_systems(
             Update,
             (button_actions, update_scroll_position).run_if(in_state(GameState::Desk)),

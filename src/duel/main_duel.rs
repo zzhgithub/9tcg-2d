@@ -14,9 +14,10 @@ use bevy_simple_text_input::{
 };
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct DuelMainAction(pub DuelMainActionType);
 
+#[derive(Debug, Clone, Copy)]
 pub enum DuelMainActionType {
     Connect,
     Disconnect,
@@ -61,7 +62,6 @@ pub fn setup_duel(mut commands: Commands, asset_server: Res<AssetServer>) {
 
 pub fn handle_main_button(
     interaction_query: Query<(&Interaction, &DuelMainAction), (Changed<Interaction>, With<Button>)>,
-    mut commands: Commands,
     mut next_game_state: ResMut<NextState<GameState>>,
     mut next_duel_state: ResMut<NextState<DuelState>>,
     // 连接相关
