@@ -4,6 +4,7 @@ pub mod core;
 pub mod desk;
 pub mod duel;
 pub mod menu;
+pub mod server;
 pub mod splash;
 pub mod utils;
 

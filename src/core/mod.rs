@@ -2,6 +2,7 @@ pub mod action_event;
 pub mod card;
 pub mod card_info;
 pub mod duel;
+pub mod duel_impls;
 pub mod effect;
 pub mod filed;
 pub mod player_info;

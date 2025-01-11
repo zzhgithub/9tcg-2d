@@ -1,5 +1,6 @@
 
 
+# Run
 ```shell
 cargo run --release --bin client
 cargo run --release --bin server
@@ -10,6 +11,10 @@ cargo run --bin client
 cargo run --bin server
 ```
 
+# xBuild
+```shell
+cargo build --target x86_64-unknown-linux-gnu --release --bin server
+```
 
 # 人物表
 - [x] 开场画面

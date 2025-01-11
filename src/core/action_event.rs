@@ -1,7 +1,8 @@
+use crate::common::desks_datas::DeskData;
 use crate::core::process::ProcessState;
 use bevy::prelude::App;
-use bevy_eventwork::NetworkMessage;
 use bevy_eventwork::tcp::TcpProvider;
+use bevy_eventwork::{ConnectionId, NetworkMessage};
 use serde::{Deserialize, Serialize};
 
 #[deprecated]
@@ -35,11 +36,23 @@ pub enum ActionType {
         to: ProcessState,
     },
 }
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub enum ToServerAction {
+    JoinRoom(JoinRoomData),
+}
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct JoinRoomData {
+    pub username: String,
+    pub room_name: String,
+    pub desk: DeskData,
+}
 
 // 谁 目标 操作 内容
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ToServerMessage {
+    pub my_connect_id: u32,
     pub debug_message: String,
+    pub action: ToServerAction,
 }
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ToClientMessage {

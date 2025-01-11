@@ -1,6 +1,7 @@
 use crate::common::desks_datas::{DeskData, DesksDataList};
 use crate::common::game_state::{DuelState, GameState};
 use crate::common::settings::Settings;
+use crate::core::action_event::{JoinRoomData, ToServerAction, ToServerMessage};
 use crate::desk::detail::DeskSelect;
 use crate::duel::ConnectPlayer;
 use crate::duel::common::{create_label_and_input, spawn_button};
@@ -77,7 +78,7 @@ pub fn handle_connected_button(
             match action.0 {
                 DuelMainActionType::Disconnect => {
                     info!("Disconnect by Button!");
-                    net.disconnect(connect_player.0.unwrap())
+                    net.disconnect(connect_player.0.clone().unwrap())
                         .expect("Couldn't disconnect from server!");
                     connect_player.0 = None;
                     next_duel_state.set(DuelState::Main);
@@ -90,9 +91,22 @@ pub fn handle_connected_button(
                     let room_number = room_number_input.0.clone();
                     info!(
                         "Username: {} use deskName {} to roomNumber {}",
-                        username, used_desk.name, room_number
+                        username.clone(),
+                        used_desk.name.clone(),
+                        room_number.clone()
                     );
+                    let data = JoinRoomData {
+                        username: username.clone(),
+                        room_name: room_number.clone(),
+                        desk: used_desk.clone(),
+                    };
                     // 尝试发送事件
+                    net.send_message(connect_player.0.clone().unwrap(), ToServerMessage {
+                        my_connect_id: connect_player.0.clone().unwrap().id,
+                        debug_message: "".to_string(),
+                        action: ToServerAction::JoinRoom(data),
+                    })
+                    .expect("send message error");
                 }
                 _ => {
                     info!("unhandled duel action {:?}", action);
