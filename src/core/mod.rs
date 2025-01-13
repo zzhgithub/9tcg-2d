@@ -1,6 +1,7 @@
 pub mod action_event;
 pub mod card;
 pub mod card_info;
+pub mod card_info_manager;
 pub mod duel;
 pub mod duel_impls;
 pub mod effect;

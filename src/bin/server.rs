@@ -116,7 +116,12 @@ fn handle_messages(
                     message.my_connect_id.clone(),
                     data.desk.clone(),
                 ) {
-                    Ok(_) => {}
+                    Ok(_) => {
+                        if duel.check_is_ready_to_play() {
+                            duel.process();
+                            // todo 这里进行之后的事件提醒
+                        }
+                    }
                     Err(_) => {
                         //TODO 通知下游出现问题
                         info!("Could not add player: {}", data.room_name.clone());

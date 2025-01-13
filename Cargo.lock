@@ -4504,6 +4504,8 @@ dependencies = [
  "bevy_kira_audio",
  "bevy_simple_text_input",
  "dirs",
+ "lazy_static",
+ "rand",
  "serde",
 ]
 
