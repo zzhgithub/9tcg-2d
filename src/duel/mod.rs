@@ -60,6 +60,11 @@ impl Plugin for DuelPlugin {
             Update,
             handle_connected_button.run_if(in_state(DuelState::Connected)),
         );
+        // 测试使用！
+        app.add_systems(
+            Update,
+            handel_message.run_if(in_state(DuelState::Connected)),
+        );
     }
 }
 

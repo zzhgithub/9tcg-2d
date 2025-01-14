@@ -5,9 +5,8 @@ use bevy_eventwork::{ConnectionId, EventworkRuntime, Network, NetworkData, Netwo
 use std::net::{IpAddr, SocketAddr};
 
 use bevy_eventwork::tcp::{NetworkSettings, TcpProvider};
-use tcg_2d::core::action_event::{
-    ToServerAction, ToServerMessage, server_register_network_messages,
-};
+use tcg_2d::core::action_event::{ToServerMessage, server_register_network_messages};
+use tcg_2d::core::actions::to_server_actions::ToServerAction;
 use tcg_2d::core::duel::Duel;
 use tcg_2d::server::{Player, PlayerState, PlayersManager, RoomManager};
 
@@ -118,8 +117,26 @@ fn handle_messages(
                 ) {
                     Ok(_) => {
                         if duel.check_is_ready_to_play() {
-                            duel.process();
-                            // todo 这里进行之后的事件提醒
+                            // 进行流程
+                            match duel.process() {
+                                Ok(messages) => {
+                                    //  这里进行之后的事件提醒
+                                    for message in messages {
+                                        info!("发送消息：\n{:?}", message);
+                                        // 发送数据
+                                        net.send_message(
+                                            ConnectionId {
+                                                id: message.to_connect_id,
+                                            },
+                                            message,
+                                        )
+                                        .unwrap();
+                                    }
+                                }
+                                Err(_) => {
+                                    error!("Could not process message");
+                                }
+                            }
                         }
                     }
                     Err(_) => {

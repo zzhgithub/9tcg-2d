@@ -1,7 +1,8 @@
 use crate::common::desks_datas::{DeskData, DesksDataList};
 use crate::common::game_state::{DuelState, GameState};
 use crate::common::settings::Settings;
-use crate::core::action_event::{JoinRoomData, ToServerAction, ToServerMessage};
+use crate::core::action_event::ToServerMessage;
+use crate::core::actions::to_server_actions::{JoinRoomData, ToServerAction};
 use crate::desk::detail::DeskSelect;
 use crate::duel::ConnectPlayer;
 use crate::duel::common::{create_label_and_input, spawn_button};
@@ -67,8 +68,8 @@ pub fn handle_connected_button(
     mut commands: Commands,
     mut next_duel_state: ResMut<NextState<DuelState>>,
     // 连接相关
+    connect_player: Res<ConnectPlayer>,
     net: ResMut<Network<TcpProvider>>,
-    mut connect_player: ResMut<ConnectPlayer>,
     username_input: Single<&TextInputValue, With<UsernameInput>>,
     room_number_input: Single<&TextInputValue, With<RoomNumberInput>>,
     desk_list: Res<Persistent<DesksDataList>>,
