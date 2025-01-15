@@ -7,10 +7,13 @@ use std::net::{IpAddr, SocketAddr};
 use bevy_eventwork::tcp::{NetworkSettings, TcpProvider};
 use tcg_2d::core::action_event::{ToServerMessage, server_register_network_messages};
 use tcg_2d::core::actions::to_server_actions::ToServerAction;
+use tcg_2d::core::card_info_manager::load_all_cards;
 use tcg_2d::core::duel::Duel;
 use tcg_2d::server::{Player, PlayerState, PlayersManager, RoomManager};
 
 fn main() {
+    // 一开始加载全部数据
+    load_all_cards();
     let mut app = App::new();
     app.add_plugins((MinimalPlugins, bevy::log::LogPlugin::default()));
 
@@ -112,7 +115,7 @@ fn handle_messages(
 
                 match duel.add_player(
                     data.username.clone(),
-                    message.my_connect_id.clone(),
+                    message.source().id.clone(),
                     data.desk.clone(),
                 ) {
                     Ok(_) => {
@@ -147,7 +150,7 @@ fn handle_messages(
                     }
                 }
                 room_manager.0.insert(data.room_name.clone(), duel);
-                if let Some(mut player) = players_manager.0.get_mut(&message.my_connect_id) {
+                if let Some(mut player) = players_manager.0.get_mut(&message.source().id) {
                     player.state = PlayerState::InRoom(data.room_name.clone());
                 }
             }

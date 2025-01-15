@@ -26,17 +26,17 @@ pub enum CardState {
 #[derive(Debug, Clone)]
 pub struct Card {
     //卡片层级
-    z_index: usize,
+    pub z_index: usize,
     // 正面朝上？
-    face_up: bool,
+    pub face_up: bool,
     // 对手是否可见?
-    can_see: bool,
+    pub can_see: bool,
     // 卡片方向
-    card_direction: CardDirection,
+    pub card_direction: CardDirection,
     // 状态信息
-    card_state: Option<Vec<CardState>>,
+    pub card_state: Option<Vec<CardState>>,
     // 卡片信息
-    card_info: CardInfo,
+    pub card_info: CardInfo,
 }
 
 impl Card {

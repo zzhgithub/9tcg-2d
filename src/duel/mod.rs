@@ -83,6 +83,7 @@ fn handle_network_events(
             NetworkEvent::Connected(connect_id) => {
                 info!("Connected !!");
                 connect_player.0 = Some(connect_id.clone());
+                info!("Connected player: {:?}", connect_id);
                 next_duel_state.set(DuelState::Connected);
             }
             NetworkEvent::Disconnected(_) => {

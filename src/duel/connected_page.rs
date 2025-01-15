@@ -68,7 +68,7 @@ pub fn handle_connected_button(
     mut commands: Commands,
     mut next_duel_state: ResMut<NextState<DuelState>>,
     // 连接相关
-    connect_player: Res<ConnectPlayer>,
+    mut connect_player: ResMut<ConnectPlayer>,
     net: ResMut<Network<TcpProvider>>,
     username_input: Single<&TextInputValue, With<UsernameInput>>,
     room_number_input: Single<&TextInputValue, With<RoomNumberInput>>,
@@ -102,8 +102,8 @@ pub fn handle_connected_button(
                         desk: used_desk.clone(),
                     };
                     // 尝试发送事件
+                    info!("My id: {}", connect_player.0.clone().unwrap().id);
                     net.send_message(connect_player.0.clone().unwrap(), ToServerMessage {
-                        my_connect_id: connect_player.0.clone().unwrap().id,
                         debug_message: "".to_string(),
                         action: ToServerAction::JoinRoom(data),
                     })

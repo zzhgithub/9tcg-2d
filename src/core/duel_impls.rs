@@ -84,8 +84,9 @@ impl Duel {
                     action: ToClientAction::DrawCard(others),
                 });
             }
-            Err(_) => {
+            Err(err) => {
                 // todo其他事件
+                error!(err);
             }
         }
         ret
@@ -104,15 +105,19 @@ impl DuelInfo {
             for i in 0..num {
                 if let Some(mut card) = desks.pop() {
                     card.card_to_hand();
-                    hands.push(card);
+                    hands.push(card.clone());
+                    // 正面
+                    ret.push(Some(card.card_info.code.clone()));
+                    // 背面
+                    ret2.push(None);
                 } else {
                     // TODO 玩家游戏失败
-                    return Err("无法抽卡失败".to_string());
+                    return Err("无法抽卡失败,卡组Vec is None".to_string());
                 }
             }
         } else {
             // TODO 玩家游戏失败
-            return Err("无法抽卡失败".to_string());
+            return Err("无法抽卡失败, 卡组为None".to_string());
         }
         self.player_hand_zone.cards = Some(hands.clone());
         Ok((ret, ret2))
@@ -130,12 +135,13 @@ impl DuelInfo {
         if let Some(player_info) = self.player_info.clone() {
             let mut desk_vec = Vec::new();
             for card_code in player_info.desks.iter() {
-                if let Some(card_info) = CARD_INFO_MAP.get(card_code) {
+                if let Some(card_info) = CARD_INFO_MAP.lock().unwrap().get(card_code) {
                     desk_vec.push(Card::build_desk_card(card_info.clone()));
                 } else {
                     error!("Card {} not found", card_code);
                 }
             }
+            self.player_desk_zone.cards = Some(desk_vec);
         }
     }
 }

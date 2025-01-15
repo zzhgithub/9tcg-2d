@@ -42,7 +42,6 @@ pub enum ActionType {
 // 谁 目标 操作 内容
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ToServerMessage {
-    pub my_connect_id: u32,
     pub debug_message: String,
     pub action: ToServerAction,
 }
